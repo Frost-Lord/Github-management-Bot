@@ -54,7 +54,7 @@ module.exports = {
             new Discord.ButtonBuilder()
             .setCustomId("Refresh")
             .setLabel("Refresh")
-            .setStyle(Discord.ButtonStyle.Primary)
+            .setStyle(Discord.ButtonStyle.Danger )
             .setEmoji("🔄")
         )
 
