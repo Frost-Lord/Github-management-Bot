@@ -79,4 +79,52 @@ async function GenRepo(id, user, org) {
     }
 }
 
-module.exports = { GenRepo, RequestGithub }
+
+async function getRepoDetails(owner, repo) {
+    try {
+        const commonOptions = {
+            headers: {
+                'accept': 'application/vnd.github+json',
+                'Authorization': `token ${token}`
+            },
+            data: {
+                per_page: 100,
+                page: 1
+            }
+        };
+
+        const issuesUrl = `https://api.github.com/repos/${owner}/${repo}/issues`;
+        const issuesOptions = { ...commonOptions, data: { ...commonOptions.data, state: 'all', sort: 'created', direction: 'desc' } };
+        const issues = await RequestGithub(issuesUrl, issuesOptions);
+
+        const branchesUrl = `https://api.github.com/repos/${owner}/${repo}/branches`;
+        const branchesOptions = { ...commonOptions };
+        const branches = await RequestGithub(branchesUrl, branchesOptions);
+
+        const commitsUrl = `https://api.github.com/repos/${owner}/${repo}/commits`;
+        const commitsOptions = { ...commonOptions };
+        const commits = await RequestGithub(commitsUrl, commitsOptions);
+
+        const releasesUrl = `https://api.github.com/repos/${owner}/${repo}/releases`;
+        const releasesOptions = { ...commonOptions };
+        const releases = await RequestGithub(releasesUrl, releasesOptions);
+
+        const pullRequestsUrl = `https://api.github.com/repos/${owner}/${repo}/pulls`;
+        const pullRequestsOptions = { ...commonOptions, data: { ...commonOptions.data,state: 'all', } };
+        const pullRequests = await RequestGithub(pullRequestsUrl, pullRequestsOptions);
+
+        return {
+            issues,
+            branches,
+            commits,
+            releases,
+            pullRequests,
+        };
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
+module.exports = { GenRepo, RequestGithub, getRepoDetails }
