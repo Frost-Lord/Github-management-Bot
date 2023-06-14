@@ -1,5 +1,5 @@
 const Discord = require("discord.js");
-const { GenRepo } = require("../../utils/api");
+const { GenRepo, UpdateRepo } = require("../../utils/api");
 const RepoSchema = require("../../../Database/Schema/repo.js")
 const client = global.client;
 
@@ -25,7 +25,7 @@ module.exports = {
         await interaction.deferReply();
 
         const Scema = await RepoSchema.findOne({ id: interaction.guild.id });
-        if (!Scema) await GenRepo(interaction.guild.id).then(() => {
+        if (!Scema) return await GenRepo(interaction.guild.id).then(() => {
             interaction.editReply({ content: "Please wait for 5 seconds and try again."})
         })
 
@@ -81,6 +81,13 @@ module.exports = {
                     await btn.deferUpdate();
                     embed.setDescription(`**Type: All**\n\n${UserRepos.map((repo, index) => `${index + 1}. [${repo.name}](${repo.html_url})`).join("\n")} `)
                     interaction.editReply({ embeds: [embed], components: [row] })
+                } else if (btn.customId === "Refresh") {
+                    await btn.deferUpdate();
+                    await GenRepo(interaction.guild.id, 'Update')
+                    const newEmbed = new Discord.EmbedBuilder()
+                    .setTitle("**Action Completed**")
+                    .setDescription("🔄️ Refreshed the list of Repositories \n `Please wait for 5 seconds and re-run the command.` ")
+                    interaction.editReply({ embeds: [newEmbed], components: [] })
                 }
             });
         } else {

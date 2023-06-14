@@ -63,17 +63,19 @@ async function GetUserRepos() {
     return userRepos;
 }
 
-async function GenRepo(id, user, org) {
+async function GenRepo(id, Update = false) {
     try {
-        const UserRepos = await GetUserRepos(user)
-        const OrgRepos = await GetOrgsRepos(org)
+        const data = Update ? await RepoSchema.findOne({ id: id }) : new RepoSchema({ id: id });
 
-        new RepoSchema({
-            id: id,
-            UserRepos: UserRepos,
-            OrgRepos: OrgRepos
-        }).save()
-        return true
+        if (!data) throw new Error('Could not find or create data for id: ' + id);
+        
+        const [UserRepos, OrgRepos] = await Promise.all([GetUserRepos(), GetOrgsRepos()]);
+
+        data.UserRepos = UserRepos;
+        data.OrgRepos = OrgRepos;
+        await data.save();
+
+        return true;
     } catch (err) {
         console.log(err)
     }
@@ -110,7 +112,7 @@ async function getRepoDetails(owner, repo) {
         const releases = await RequestGithub(releasesUrl, releasesOptions);
 
         const pullRequestsUrl = `https://api.github.com/repos/${owner}/${repo}/pulls`;
-        const pullRequestsOptions = { ...commonOptions, data: { ...commonOptions.data,state: 'all', } };
+        const pullRequestsOptions = { ...commonOptions, data: { ...commonOptions.data, state: 'all', } };
         const pullRequests = await RequestGithub(pullRequestsUrl, pullRequestsOptions);
 
         return {
@@ -127,4 +129,4 @@ async function getRepoDetails(owner, repo) {
 }
 
 
-module.exports = { GenRepo, RequestGithub, getRepoDetails }
+module.exports = { GenRepo, RequestGithub, getRepoDetails };

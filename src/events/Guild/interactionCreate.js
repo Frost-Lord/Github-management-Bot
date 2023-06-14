@@ -41,6 +41,15 @@ const {
         return interaction.reply({ embeds: [embed] });
       }
     }
+
+    if (interaction.member.id !== process.env.OWNER_ID) {
+      const embed = new EmbedBuilder()
+        .setDescription(
+          `🚫 Only Owners of the bot can run any of its commands!`
+        )
+        .setColor("Red");
+      return interaction.reply({ embeds: [embed] });
+    }
   
     if (command.permissions) {
       if (
