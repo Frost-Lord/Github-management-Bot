@@ -1,6 +1,10 @@
 # Discord Bot - Repository Manager
 
 This Discord bot is designed to help you manage your repositories directly from your Discord server. It provides commands to create and delete pull requests, issues, branches, commits, releases, and more.
+<p align="center">
+    <img src="./img.png">
+    <img src="./img2.png">
+</p>
 
 ## Features
 
