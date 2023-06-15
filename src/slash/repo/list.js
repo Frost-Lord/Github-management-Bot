@@ -93,23 +93,25 @@ module.exports = {
         } else {
             const orgRepos = Scema.OrgRepos;
 
-            const repoList = orgRepos.map((repoArray, index) => {
-              const orgName = Object.keys(repoArray)[0];
-              const subRepos = repoArray[orgName];
+            const repoList = orgRepos.flatMap((repoArray) => {
+              const orgNames = Object.keys(repoArray);
             
-              const subRepoList = subRepos.map((subRepo, subIndex) => {
-                return `**${subIndex}.** [${subRepo.name}](${subRepo.html_url})`;
+              return orgNames.flatMap((orgName) => {
+                const subRepos = repoArray[orgName] || [];
+            
+                const subRepoList = subRepos.map((subRepo, subIndex) => {
+                  return `${subIndex}. [${subRepo.name}](${subRepo.html_url})`;
+                });
+            
+                return [`**${orgName}**`, ...subRepoList];
               });
-            
-              return `**${orgName}**\n\n${subRepoList.join('\n')}`;
             });
             
             const embed = new Discord.EmbedBuilder()
               .setTitle('Org Repos')
-              .setDescription(repoList.join('\n\n'));
+              .setDescription(repoList.join('\n'));
             
-            interaction.editReply({ embeds: [embed], components: [row] });
-            
+            interaction.editReply({ embeds: [embed], components: [row] });            
         }
     },
 };
