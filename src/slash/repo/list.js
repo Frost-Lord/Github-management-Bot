@@ -60,7 +60,7 @@ module.exports = {
 
         if (subCommand == "User") {
             const UserRepos = Scema.UserRepos;
-            embed.setDescription(`**Type All**\n\n${UserRepos.map((repo, index) => `${index + 1}. [${repo.name}](${repo.html_url})`).join("\n")} `)
+            embed.setDescription(`**Type All**\n\n${UserRepos.map((repo, index) => `**${index + 1}.** [${repo.name}](${repo.html_url})`).join("\n")} `)
             interaction.editReply({ embeds: [embed], components: [row] })
 
             const filter = (i) => i.user.id === interaction.user.id;
@@ -91,7 +91,25 @@ module.exports = {
                 }
             });
         } else {
+            const orgRepos = Scema.OrgRepos;
 
+            const repoList = orgRepos.map((repoArray, index) => {
+              const orgName = Object.keys(repoArray)[0];
+              const subRepos = repoArray[orgName];
+            
+              const subRepoList = subRepos.map((subRepo, subIndex) => {
+                return `**${subIndex}.** [${subRepo.name}](${subRepo.html_url})`;
+              });
+            
+              return `**${orgName}**\n\n${subRepoList.join('\n')}`;
+            });
+            
+            const embed = new Discord.EmbedBuilder()
+              .setTitle('Org Repos')
+              .setDescription(repoList.join('\n\n'));
+            
+            interaction.editReply({ embeds: [embed], components: [row] });
+            
         }
     },
 };
